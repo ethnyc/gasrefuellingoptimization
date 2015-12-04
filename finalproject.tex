@@ -1,0 +1,159 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage[nodisplayskipstretch]{setspace}
+
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+%\ifcvprfinal\pagestyle{empty}\fi
+\setcounter{page}{1}
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{Gas Refuelling Optimization Modelled as a Markov Decision Process}
+
+\author{
+Ethan Chan\\
+Computer Science\\
+Stanford University\\
+{\tt\small ethancys@cs.stanford.edu}
+}
+
+\maketitle
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+The idea is to solve optimizing a strategy of when to refuel gas on a road trip routine to optimize fuel efficiency.
+\end{abstract}
+
+%%%%%%%%% BODY TEXT
+\section{Introduction}
+Many a time, when people commute, there is always a tough decision of making a detour to refuel gas. Google and Apple has already integrated GasBuddy into their Maps feature. But if we were going from point A to point B, how will we know when and where do we refuel at gas stations such that we optimize fuel cost and journey time? Given a starting and destination point, and refuelling pit stops along the way, we want to be able to find the optimal refuelling strategy.
+
+Despite such gas integration into Google Maps feature, the data is now presented at the user, but the user still has to optimize their own paths using their own internal calculations as seen from the comments "now I can drive 10 miles out of my way to save 47 cents on a tank of gas!"and "I get gas where it's convenient, not where it's cheapest." - http://www.macrumors.com/2015/02/25/apple-maps-partners-greatschools-gasbuddy/ 
+
+
+\section{Review of Previous Work}
+
+\subsection{Dynamic Programming with Cost Function}
+Current way of solving it utilizes dynamic programming where the cost function is constant.\\
+http://math.stackexchange.com/questions/508430/finding-a-minimal-number-of-charging-stops-along-the-route\\
+https://carlstrom.com/stanford/cs161/ps4sol.pdf\\
+
+\subsection{Solving Analytically}
+Based on fuel cost and distance, we can analytically calculate the best time for a single journey
+
+}
+
+\section{Model}
+
+The refuelling optimization stategy will be modelled as a Markov Decision Process. The Markove decision process will be modelled as a tuple $(S,A,T, \gamma, R)$ where $S$ is a set of states, A is a set of actions, T are the transition probabilities, $\gamma$ is the transition probabilities, $R$ is the reward function.\\
+
+\subsection{States}
+A state is defined by the following 4 variables:
+\begin{enumerate}
+\item X,Y position
+    \begin{enumerate}
+        \item Our model will now be simulated in a $n \times n$ gridworld as a simple representation of a navigation problem that can be extended in the future
+    \end{enumerate}
+\item Gas level
+    \begin{enumerate}
+        \item The gas level will be discretized at 0.01 fraction intervals
+        \item 0.00, 0.01, 0.02, ... 1.00
+    \end{enumerate}
+\item Gas station present
+    \begin{enumerate}
+        \item Present / Not present
+    \end{enumerate}
+\item Gas Price (in dollars)
+    \begin{enumerate}
+        \item Gas prices states are discretized at \$0.10 intervals according to the maximum and minimum average gas prices found on GasBuddy.com 
+        \item \$2.00, \$2.10, ... \$4.00
+    \end{enumerate}
+\end{enumerate}
+
+From these variables, we now know that there are 
+\begin{align*}
+n \times n \times |gas level| \times |gas station present| \times |gas price|\\
+= 1000 * 1000 * 100 * 2 * 20\\
+= 4000 000 000
+\end{align*} different states.
+
+\subsection{Actions}
+Actions are defined by 2 variables, the direction of movement, as well as  
+\begin{enumerate}
+\item Movement can only be done to adjacent squares in the grid
+    \begin{enumerate}
+        \item Left
+        \item Right
+        \item Up
+        \item Down 
+    \end{enumerate}
+\item Refuel Gas
+    \begin{enumerate}
+    \item Refuel / Not refuel
+    \item Simplifying assumption is that we can only refuel to the max
+    \end{enumerate}
+\end{enumerate}
+\subsection{Transitions}
+Although the state space is large, the a state can only transition to a state whose physically adjacent on the grid - stay, above, below, left, right. In addition, the state can only transition to another state whose gas level is $ 0.01$ less than current gas level or at gas level 1.00. Heuristic behind this transition is that it costs $0.01$ worth of fuel to move to the next state.
+
+These constraints means that from any given state, there are only $ |physically adjacent| \times |gas level| \times |gas station present| \times |gas price| = 5 \times 2 \times 2 \times 20 = 400$ possible transitions from a state space of 40000000.
+
+To define the transition function in more mathematical terms, $T(S'\mid S)$ is defined where $S' \in\{S_{x,y \pm 1} \cup S_{level - 0.01} \cup S_{level = 1.00} \cup S_{station} \cup  S_{price} \}.
+
+\subsection{Rewards}
+
+R(s,a) = 
+
+fuel level
+
+high fuel , top up,  low reward
+
+low fuel, top up, good reward
+
+gas station present
+
+low fuel, no gas, negative infinity
+
+destination, max reward
+
+
+\subsection{Discount Factor}
+
+\section{Initialization}
+
+
+\section{Choice of Algorithm}
+\subsection{Value Iteration}
+\subsection{Optimized for Refuelling}
+
+\section{Results}
+
+\section{Discussions}
+\subsection{Next Steps}
+
+{\small
+\bibliographystyle{ieee}
+\bibliography{egbib}
+}
+
+\end{document}
